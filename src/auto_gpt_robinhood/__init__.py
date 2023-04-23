@@ -1,20 +1,12 @@
 """This is a plugin to use Auto-GPT with Robinhood."""
 from typing import Any, Dict, List, Optional, Tuple, TypeVar, TypedDict
 from auto_gpt_plugin_template import AutoGPTPluginTemplate
-import pyrh
 
 # Robinhood
-import requests
+import pyrh
 import os
-import numpy as np
-import ta
 
 PromptGenerator = TypeVar("PromptGenerator")
-
-username = os.getenv(self, "ROBINHOOD_USERNAME")
-password = os.getenv(self, "ROBINHOOD_PASSWORD")
-
-ROBINHOOD = pyrh.Robinhood(robinhood_username, robinhood_password)
 
 class Message(TypedDict):
     role: str
@@ -31,6 +23,9 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
         self._name = "Auto-GPT-Robinhood"
         self._version = "0.0.1"
         self._description = "This is a plugin for Auto-GPT-Robinhood."
+        self.username = os.getenv("ROBINHOOD_USERNAME")
+        self.password = os.getenv("ROBINHOOD_PASSWORD")
+        self.robinhood = pyrh.Robinhood(self.username, self.password)
 
     def post_prompt(self, prompt: PromptGenerator) -> PromptGenerator:
         prompt.add_command(
@@ -228,7 +223,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`): JSON contents from `quotes` endpoint
 
         """
-        return ROBINHOOD.quote_data(stock)
+        return self.robinhood.quote_data(stock)
 
     def get_quote_list(self, stock: str, key: str) -> list:
         """Returns multiple stock info and keys from quote_data (prompt if blank)
@@ -243,11 +238,11 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
                             if none of the stocks were valid
 
         """
-        return ROBINHOOD.get_quote_list(stock, key)
+        return self.robinhood.get_quote_list(stock, key)
 
     def get_quote(self, stock: str):
         """Wrapper for quote_data."""
-        return ROBINHOOD.get_quote(stock)
+        return self.robinhood.get_quote(stock)
 
     def get_stock_marketdata(self, instruments: list[str]) -> list[dict]:
         """Fetch stock market data.
@@ -261,7 +256,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
                 invalid, a None will occur at that position.
 
         """
-        return ROBINHOOD.get_stock_marketdata(instruments)
+        return self.robinhood.get_stock_marketdata(instruments)
 
     def get_historical_quotes(self, stock: str, interval: str, span: str) -> dict:
         """Fetch historical data for stock.
@@ -281,7 +276,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `historicals` endpoint
 
         """
-        return ROBINHOOD.get_historical_quotes(stock, interval, span);
+        return self.robinhood.get_historical_quotes(stock, interval, span);
 
     def get_stock_news(self, stock: str) -> dict:
         """Fetch news endpoint.
@@ -293,7 +288,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `news` endpoint
 
         """
-        return ROBINHOOD.get_news(stock);
+        return self.robinhood.get_news(stock);
 
     def get_watchlists(self, ) -> dict:
         """Fetch watchlists endpoint and queries for
@@ -302,7 +297,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
         Returns:
             (:obj:`dict`): values returned from `watchlists` and `instrument` endpoints
         """
-        return ROBINHOOD.get_watchlists()
+        return self.robinhood.get_watchlists()
 
     def ask_price(self, stock: str) -> float:
         """Get asking price for a stock.
@@ -317,7 +312,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (float): ask price
 
         """
-        return ROBINHOOD.ask_price(stock)
+        return self.robinhood.ask_price(stock)
 
     def ask_size(self, stock: str) -> int:
         """Get ask size for a stock.
@@ -332,7 +327,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (int): ask size
 
         """
-        return ROBINHOOD.ask_size(stock)
+        return self.robinhood.ask_size(stock)
 
     def bid_price(self, stock: str) -> float:
         """Get bid price for a stock.
@@ -347,7 +342,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (float): bid price
 
         """
-        return ROBINHOOD.bid_price(stock)
+        return self.robinhood.bid_price(stock)
 
     def bid_size(self, stock: str) -> int:
         """Get bid size for a stock.
@@ -362,7 +357,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (int): bid size
 
         """
-        return ROBINHOOD.bid_size(stock)
+        return self.robinhood.bid_size(stock)
 
     def last_trade_price(self, stock: str) -> float:
         """Get last trade price for a stock.
@@ -377,7 +372,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (float): last trade price
 
         """
-        return ROBINHOOD.last_trade_price(stock)
+        return self.robinhood.last_trade_price(stock)
 
     def previous_close(self, stock: str) -> float:
         """Get previous close price for a stock.
@@ -392,7 +387,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (float): previous close price
 
         """
-        return ROBINHOOD.previous_close(stock)
+        return self.robinhood.previous_close(stock)
 
     def previous_close_date(self, stock: str) -> str:
         """Get previous close date for a stock.
@@ -407,7 +402,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (str): previous close date
 
         """
-        return ROBINHOOD.previous_close_date(stock)
+        return self.robinhood.previous_close_date(stock)
 
     def get_symbol(self, stock: str) -> str:
         """Get symbol for a stock.
@@ -422,7 +417,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (str): symbol
 
         """
-        return ROBINHOOD.symbol(stock)
+        return self.robinhood.symbol(stock)
 
     def last_updated_at(self, stock: str) -> str:
         """Get last updated date for a stock.
@@ -437,22 +432,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (str): last updated date
 
         """
-        return ROBINHOOD.last_updated_at(stock)
-
-    def last_updated_at_datetime(self, stock: str) -> datetime:
-        """Get last updated date for a stock.
-
-        Note:
-            queries `quote` endpoint, dict wrapper
-
-        Args:
-            stock (str): stock ticker
-
-        Returns:
-            (datetime): last updated date
-
-        """
-        return ROBINHOOD.last_updated_at_datetime(stock)
+        return self.robinhood.last_updated_at(stock)
 
     def get_account(self, ) -> dict:
         """Fetch account endpoint.
@@ -461,7 +441,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `account` endpoint
 
         """
-        return ROBINHOOD.get_account()
+        return self.robinhood.get_account()
 
     def get_url(self, url: str) -> dict:
         """Fetch url endpoint.
@@ -473,7 +453,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `url` endpoint
 
         """
-        return ROBINHOOD.get_url(url)
+        return self.robinhood.get_url(url)
 
     def get_tickers_by_tag(self, tag: str) -> list[str]:
         """Fetch tickers by tag.
@@ -485,7 +465,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`str`) tickers
 
         """
-        return ROBINHOOD.get_tickers_by_tag(tag)
+        return self.robinhood.get_tickers_by_tag(tag)
 
     def get_options(self, stock: str, expiration_dates: list[str], option_type: str) -> list[dict]:
         """Fetch options for stock.
@@ -499,7 +479,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`dict`) values returned from `options` endpoint
 
         """
-        return ROBINHOOD.get_options(stock, expiration_dates, option_type)
+        return self.robinhood.get_options(stock, expiration_dates, option_type)
 
     def get_options_owned(self, ) -> list[dict]:
         """Fetch options owned.
@@ -508,7 +488,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`dict`) values returned from `options` endpoint
 
         """
-        return ROBINHOOD.get_options_owned()
+        return self.robinhood.get_options_owned()
 
     def get_option_market_data(self, option_id: str) -> dict:
         """Fetch option market data.
@@ -520,7 +500,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `option_market_data` endpoint
 
         """
-        return ROBINHOOD.get_option_market_data(option_id)
+        return self.robinhood.get_option_market_data(option_id)
 
     def get_option_chainid(self, symbol: str) -> str:
         """Fetch option chain id.
@@ -532,7 +512,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`str`) option chain id
 
         """
-        return ROBINHOOD.get_option_chainid(symbol)
+        return self.robinhood.get_option_chainid(symbol)
 
     def get_option_quote(self, symbol: str, strike: float, expiration_date: str, option_type: str) -> dict:
         """Fetch option quote.
@@ -547,7 +527,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `option_quote` endpoint
 
         """
-        return ROBINHOOD.get_option_quote(symbol, strike, expiration_date, option_type)
+        return self.robinhood.get_option_quote(symbol, strike, expiration_date, option_type)
 
     def get_fundamentals(self, stock: str) -> dict:
         """Fetch fundamentals.
@@ -559,7 +539,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `fundamentals` endpoint
 
         """
-        return ROBINHOOD.get_fundamentals(stock)
+        return self.robinhood.get_fundamentals(stock)
 
     def get_portfolio(self, ) -> dict:
         """Fetch portfolio.
@@ -568,7 +548,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `portfolio` endpoint
 
         """
-        return ROBINHOOD.get_portfolio()
+        return self.robinhood.get_portfolio()
 
     def order_history() -> list[dict]:
         """Fetch order history.
@@ -577,7 +557,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`dict`) values returned from `order_history` endpoint
 
         """
-        return ROBINHOOD.order_history()
+        return self.robinhood.order_history()
 
     def get_positions(self, ) -> list[dict]:
         """Fetch positions.
@@ -586,7 +566,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`dict`) values returned from `positions` endpoint
 
         """
-        return ROBINHOOD.get_positions()
+        return self.robinhood.get_positions()
 
     def get_securities_owned(self, ) -> list[dict]:
         """Fetch securities owned.
@@ -595,7 +575,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`dict`) values returned from `securities_owned` endpoint
 
         """
-        return ROBINHOOD.get_securities_owned()
+        return self.robinhood.get_securities_owned()
 
     def place_market_but_order(self, symbol: str, time_in_force: str, quantity: int):
         """Place market buy order.
@@ -609,7 +589,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_market_buy_order` endpoint
 
         """
-        return ROBINHOOD.place_market_buy_order(symbol, time_in_force, quantity)
+        return self.robinhood.place_market_buy_order(symbol, time_in_force, quantity)
 
     def place_limit_buy_order(self, symbol: str, time_in_force: str, quantity: int, price: float):
         """Place limit buy order.
@@ -624,7 +604,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_limit_buy_order` endpoint
 
         """
-        return ROBINHOOD.place_limit_buy_order(symbol, time_in_force, quantity, price)
+        return self.robinhood.place_limit_buy_order(symbol, time_in_force, quantity, price)
 
     def place_stop_loss_buy_order(self, symbol: str, time_in_force: str, stop_price: float, quantity: int):
         """Place stop loss buy order.
@@ -639,7 +619,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_stop_loss_buy_order` endpoint
 
         """
-        return ROBINHOOD.place_stop_loss_buy_order(symbol, time_in_force, stop_price, quantity)
+        return self.robinhood.place_stop_loss_buy_order(symbol, time_in_force, stop_price, quantity)
 
     def place_stop_limit_buy_order(self, symbol: str, time_in_force: str, stop_price: float, price: float, quantity: int):
         """Place stop limit buy order.
@@ -655,7 +635,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_stop_limit_buy_order` endpoint
 
         """
-        return ROBINHOOD.place_stop_limit_buy_order(symbol, time_in_force, stop_price, price, quantity)
+        return self.robinhood.place_stop_limit_buy_order(symbol, time_in_force, stop_price, price, quantity)
 
     def place_market_sell_order(self, symbol: str, time_in_force: str, quantity: int):
         """Place market sell order.
@@ -669,7 +649,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_market_sell_order` endpoint
 
         """
-        return ROBINHOOD.place_market_sell_order(symbol, time_in_force, quantity)
+        return self.robinhood.place_market_sell_order(symbol, time_in_force, quantity)
 
     def place_limit_sell_order(self, symbol: str, time_in_force: str, price: float, quantity: int):
         """Place limit sell order.
@@ -684,7 +664,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_limit_sell_order` endpoint
 
         """
-        return ROBINHOOD.place_limit_sell_order(symbol, time_in_force, price, quantity)
+        return self.robinhood.place_limit_sell_order(symbol, time_in_force, price, quantity)
 
     def place_stop_loss_sell_order(self, symbol: str, time_in_force: str, stop_price: float, quantity: int): 
         """Place stop loss sell order.
@@ -699,7 +679,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_stop_loss_sell_order` endpoint
 
         """
-        return ROBINHOOD.place_stop_loss_sell_order(symbol, time_in_force, stop_price, quantity)
+        return self.robinhood.place_stop_loss_sell_order(symbol, time_in_force, stop_price, quantity)
 
     def place_stop_limit_sell_order(self, symbol: str, time_in_force: str, price: float, stop_price: float, quantity: int):
         """Place stop limit sell order.
@@ -715,7 +695,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `place_stop_limit_sell_order` endpoint
 
         """
-        return ROBINHOOD.place_stop_limit_sell_order(symbol, time_in_force, price, stop_price, quantity)
+        return self.robinhood.place_stop_limit_sell_order(symbol, time_in_force, price, stop_price, quantity)
 
     def get_open_orders(self, ) -> list[dict]:
         """Fetch open orders.
@@ -724,7 +704,7 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`list` of :obj:`dict`) values returned from `open_orders` endpoint
 
         """
-        return ROBINHOOD.get_open_orders()
+        return self.robinhood.get_open_orders()
 
     def cancel_order(order_id: str):
         """Cancel order.
@@ -736,4 +716,4 @@ class AutoGPTRobinhoodPlugin(AutoGPTPluginTemplate):
             (:obj:`dict`) values returned from `cancel_order` endpoint
 
         """
-        return ROBINHOOD.cancel_order(order_id)
+        return self.robinhood.cancel_order(order_id)
